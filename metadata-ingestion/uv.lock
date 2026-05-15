@@ -65,12 +65,9 @@ abs = [
     { name = "azure-identity" },
     { name = "azure-storage-blob" },
     { name = "azure-storage-file-datalake" },
-    { name = "cachetools" },
     { name = "more-itertools" },
     { name = "parse" },
     { name = "pyarrow" },
-    { name = "pydeequ" },
-    { name = "pyspark" },
     { name = "smart-open", extra = ["azure"] },
     { name = "tableschema" },
     { name = "ujson" },
@@ -382,7 +379,6 @@ databricks = [
     { name = "pandas" },
     { name = "patchy" },
     { name = "pip" },
-    { name = "pyspark" },
     { name = "requests" },
     { name = "schwifty" },
     { name = "sqlalchemy" },
@@ -1436,6 +1432,11 @@ profiling-ge = [
 pulsar = [
     { name = "requests" },
 ]
+pyspark = [
+    { name = "cachetools" },
+    { name = "pydeequ" },
+    { name = "pyspark" },
+]
 qlik-sense = [
     { name = "patchy" },
     { name = "requests" },
@@ -1494,8 +1495,6 @@ s3 = [
     { name = "more-itertools" },
     { name = "parse" },
     { name = "pyarrow" },
-    { name = "pydeequ" },
-    { name = "pyspark" },
     { name = "smart-open", extra = ["s3"] },
     { name = "tableschema" },
     { name = "ujson" },
@@ -1718,7 +1717,6 @@ unity-catalog = [
     { name = "pandas" },
     { name = "patchy" },
     { name = "pip" },
-    { name = "pyspark" },
     { name = "requests" },
     { name = "schwifty" },
     { name = "sqlalchemy" },
@@ -1926,7 +1924,6 @@ requires-dist = [
     { name = "cached-property", specifier = "<3.0.0" },
     { name = "cached-property", marker = "extra == 'dev'", specifier = "<3.0.0" },
     { name = "cached-property", marker = "extra == 'docs'", specifier = "<3.0.0" },
-    { name = "cachetools", marker = "extra == 'abs'", specifier = "<6.0.0" },
     { name = "cachetools", marker = "extra == 'all'", specifier = "<6.0.0" },
     { name = "cachetools", marker = "extra == 'athena'", specifier = "<6.0.0" },
     { name = "cachetools", marker = "extra == 'aws-secret-manager'", specifier = "<6.0.0" },
@@ -1967,6 +1964,7 @@ requires-dist = [
     { name = "cachetools", marker = "extra == 'postgres'", specifier = "<6.0.0" },
     { name = "cachetools", marker = "extra == 'presto'", specifier = "<6.0.0" },
     { name = "cachetools", marker = "extra == 'presto-on-hive'", specifier = "<6.0.0" },
+    { name = "cachetools", marker = "extra == 'pyspark'", specifier = "<6.0.0" },
     { name = "cachetools", marker = "extra == 'redshift'", specifier = "<6.0.0" },
     { name = "cachetools", marker = "extra == 'redshift-slim'", specifier = "<6.0.0" },
     { name = "cachetools", marker = "extra == 's3'", specifier = "<6.0.0" },
@@ -2592,7 +2590,6 @@ requires-dist = [
     { name = "pydantic", marker = "extra == 'docs'", specifier = ">=2.4.0,<2.12" },
     { name = "pydantic", marker = "extra == 'iceberg'", specifier = "<2.12" },
     { name = "pydantic", marker = "extra == 'integration-tests'", specifier = "<2.12" },
-    { name = "pydeequ", marker = "extra == 'abs'", specifier = ">=1.1.0,<2.0.0" },
     { name = "pydeequ", marker = "extra == 'all'", specifier = ">=1.1.0,<2.0.0" },
     { name = "pydeequ", marker = "extra == 'delta-lake'", specifier = ">=1.1.0,<2.0.0" },
     { name = "pydeequ", marker = "extra == 'dev'", specifier = ">=1.1.0,<2.0.0" },
@@ -2600,7 +2597,7 @@ requires-dist = [
     { name = "pydeequ", marker = "extra == 'excel'", specifier = ">=1.1.0,<2.0.0" },
     { name = "pydeequ", marker = "extra == 'gcs'", specifier = ">=1.1.0,<2.0.0" },
     { name = "pydeequ", marker = "extra == 'integration-tests'", specifier = ">=1.1.0,<2.0.0" },
-    { name = "pydeequ", marker = "extra == 's3'", specifier = ">=1.1.0,<2.0.0" },
+    { name = "pydeequ", marker = "extra == 'pyspark'", specifier = ">=1.1.0,<2.0.0" },
     { name = "pydruid", marker = "extra == 'all'", specifier = ">=0.6.2,<=0.6.9" },
     { name = "pydruid", marker = "extra == 'dev'", specifier = ">=0.6.2,<=0.6.9" },
     { name = "pydruid", marker = "extra == 'docs'", specifier = ">=0.6.2,<=0.6.9" },
@@ -2648,17 +2645,14 @@ requires-dist = [
     { name = "pyopenssl", marker = "extra == 'integration-tests'", specifier = ">=26.0.0,<27.0.0" },
     { name = "pyopenssl", marker = "extra == 'mssql'", specifier = ">=26.0.0,<27.0.0" },
     { name = "pyopenssl", marker = "extra == 'mssql-odbc'", specifier = ">=26.0.0,<27.0.0" },
-    { name = "pyspark", marker = "extra == 'abs'", specifier = "~=3.5.6,<4.0.0" },
     { name = "pyspark", marker = "extra == 'all'", specifier = "~=3.5.6,<4.0.0" },
-    { name = "pyspark", marker = "extra == 'databricks'", specifier = "~=3.5.6,<4.0.0" },
     { name = "pyspark", marker = "extra == 'delta-lake'", specifier = "~=3.5.6,<4.0.0" },
     { name = "pyspark", marker = "extra == 'dev'", specifier = "~=3.5.6,<4.0.0" },
     { name = "pyspark", marker = "extra == 'docs'", specifier = "~=3.5.6,<4.0.0" },
     { name = "pyspark", marker = "extra == 'excel'", specifier = "~=3.5.6,<4.0.0" },
     { name = "pyspark", marker = "extra == 'gcs'", specifier = "~=3.5.6,<4.0.0" },
     { name = "pyspark", marker = "extra == 'integration-tests'", specifier = "~=3.5.6,<4.0.0" },
-    { name = "pyspark", marker = "extra == 's3'", specifier = "~=3.5.6,<4.0.0" },
-    { name = "pyspark", marker = "extra == 'unity-catalog'", specifier = "~=3.5.6,<4.0.0" },
+    { name = "pyspark", marker = "extra == 'pyspark'", specifier = "~=3.5.6,<4.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=6.2.2,<10.0.0" },
     { name = "pytest", marker = "extra == 'docs'", specifier = ">=6.2.2,<10.0.0" },
     { name = "pytest", marker = "extra == 'testing-utils'", specifier = ">=6.2.2,<10.0.0" },
@@ -3233,7 +3227,7 @@ requires-dist = [
     { name = "zstd", marker = "extra == 'docs'", specifier = "<1.5.6.8" },
     { name = "zstd", marker = "extra == 'integration-tests'", specifier = "<1.5.6.8" },
 ]
-provides-extras = ["base", "abs", "abs-slim", "aerospike", "athena", "aws-secret-manager", "azure-ad", "azure-data-factory", "bigquery", "bigquery-queries", "bigquery-slim", "cassandra", "circuit-breaker", "clickhouse", "clickhouse-usage", "cockroachdb", "confluence", "databricks", "datahub", "datahub-business-glossary", "datahub-debug", "datahub-documents", "datahub-gc", "datahub-kafka", "datahub-lineage-file", "datahub-lite", "datahub-rest", "dataplex", "db2", "dbt", "dbt-cloud", "debug-recording", "delta-lake", "dlt", "doris", "dremio", "druid", "dynamodb", "elasticsearch", "excel", "fabric-data-factory", "fabric-onelake", "feast", "fivetran", "flink", "gcp-secret-manager", "gcs", "gcs-slim", "glue", "grafana", "hana", "hive", "hive-metastore", "iceberg", "iceberg-catalog", "informatica", "json-schema", "kafka", "kafka-connect", "ldap", "looker", "lookml", "mariadb", "matillion-dpc", "metabase", "mlflow", "mode", "mongodb", "mssql", "mssql-odbc", "mysql", "neo4j", "nifi", "notion", "okta", "omni", "oracle", "pinecone", "postgres", "powerbi", "powerbi-report-server", "preset", "presto", "presto-on-hive", "profiling-ge", "pulsar", "qlik-sense", "rdf", "redash", "redshift", "redshift-slim", "s3", "s3-slim", "sac", "sagemaker", "salesforce", "sigma", "slack", "snaplogic", "snowflake", "snowflake-queries", "snowflake-slim", "snowflake-summary", "snowplow", "sql-parser", "sql-queries", "sqlalchemy", "starburst-trino-usage", "starrocks", "superset", "sync-file-emitter", "tableau", "teradata", "trino", "unity-catalog", "unstructured", "vertexai", "vertica", "all", "cloud", "dev", "docs", "lint", "testing-utils", "integration-tests", "debug"]
+provides-extras = ["base", "abs", "abs-slim", "aerospike", "athena", "aws-secret-manager", "azure-ad", "azure-data-factory", "bigquery", "bigquery-queries", "bigquery-slim", "cassandra", "circuit-breaker", "clickhouse", "clickhouse-usage", "cockroachdb", "confluence", "databricks", "datahub", "datahub-business-glossary", "datahub-debug", "datahub-documents", "datahub-gc", "datahub-kafka", "datahub-lineage-file", "datahub-lite", "datahub-rest", "dataplex", "db2", "dbt", "dbt-cloud", "debug-recording", "delta-lake", "dlt", "doris", "dremio", "druid", "dynamodb", "elasticsearch", "excel", "fabric-data-factory", "fabric-onelake", "feast", "fivetran", "flink", "gcp-secret-manager", "gcs", "gcs-slim", "glue", "grafana", "hana", "hive", "hive-metastore", "iceberg", "iceberg-catalog", "informatica", "json-schema", "kafka", "kafka-connect", "ldap", "looker", "lookml", "mariadb", "matillion-dpc", "metabase", "mlflow", "mode", "mongodb", "mssql", "mssql-odbc", "mysql", "neo4j", "nifi", "notion", "okta", "omni", "oracle", "pinecone", "postgres", "powerbi", "powerbi-report-server", "preset", "presto", "presto-on-hive", "profiling-ge", "pulsar", "pyspark", "qlik-sense", "rdf", "redash", "redshift", "redshift-slim", "s3", "s3-slim", "sac", "sagemaker", "salesforce", "sigma", "slack", "snaplogic", "snowflake", "snowflake-queries", "snowflake-slim", "snowflake-summary", "snowplow", "sql-parser", "sql-queries", "sqlalchemy", "starburst-trino-usage", "starrocks", "superset", "sync-file-emitter", "tableau", "teradata", "trino", "unity-catalog", "unstructured", "vertexai", "vertica", "all", "cloud", "dev", "docs", "lint", "testing-utils", "integration-tests", "debug"]
 
 [[package]]
 name = "acryl-datahub-classify"
