@@ -81,8 +81,57 @@ class TestEnsureTopic:
         )
 
         assert topic_id == 99
-        assert mime_cur.execute.call_count == 2
+        assert mime_cur.execute.call_count == 1
+        assert "SELECT id FROM" in mime_cur.execute.call_args[0][0]
+        assert "WHERE mime = %s" in mime_cur.execute.call_args[0][0]
         assert topic_cur.execute.call_count == 2
+
+    def test_upsert_includes_aggressive_retention(self) -> None:
+        mime_cur = MagicMock()
+        mime_cur.fetchone.return_value = (2,)
+        topic_cur = MagicMock()
+        topic_cur.fetchone.return_value = (1,)
+        conn = MagicMock()
+        conn.cursor.return_value.__enter__.side_effect = [mime_cur, topic_cur]
+
+        _repo().ensure_topic(
+            conn,
+            "t",
+            partition_count=2,
+            retention_max_age_seconds=0,
+            max_rows_per_topic=0,
+            max_total_payload_bytes=0,
+            aggressive_retention=True,
+        )
+
+        insert_sql = topic_cur.execute.call_args_list[0][0][0]
+        assert "aggressive_retention" in insert_sql
+        assert topic_cur.execute.call_args_list[0][0][1][-1] is True
+
+
+class TestEnsureMimeRegistered:
+    def test_lookup_existing_mime_without_insert(self) -> None:
+        cur = MagicMock()
+        cur.fetchone.return_value = (7,)
+        conn = _cursor_conn(cur)
+
+        assert _repo()._ensure_mime_registered(conn, "application/avro") == 7
+
+        assert cur.execute.call_count == 1
+        assert "SELECT id FROM" in cur.execute.call_args[0][0]
+        assert "INSERT INTO" not in cur.execute.call_args[0][0]
+
+    def test_insert_when_mime_missing(self) -> None:
+        cur = MagicMock()
+        cur.fetchone.side_effect = [None, (9,)]
+        conn = _cursor_conn(cur)
+
+        assert _repo()._ensure_mime_registered(conn, "application/test") == 9
+
+        assert cur.execute.call_count == 3
+        assert "SELECT id FROM" in cur.execute.call_args_list[0][0][0]
+        assert "INSERT INTO" in cur.execute.call_args_list[1][0][0]
+        assert "SELECT id FROM" in cur.execute.call_args_list[2][0][0]
 
 
 class TestEnqueueMessageInTransaction:
@@ -103,6 +152,7 @@ class TestEnqueueMessageInTransaction:
                 max_rows_per_topic=1,
                 max_total_payload_bytes=1,
                 default_content_type_mime=None,
+                aggressive_retention=False,
                 priority=10,
                 payload=b"x",
                 content_type=None,
@@ -130,6 +180,7 @@ class TestEnqueueMessageInTransaction:
                 max_rows_per_topic=1_000_000,
                 max_total_payload_bytes=1_000_000_000,
                 default_content_type_mime="application/avro",
+                aggressive_retention=False,
                 priority=0,
                 payload=b"\x00avro",
                 content_type=None,

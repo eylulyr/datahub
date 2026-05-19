@@ -23,6 +23,7 @@ import io.ebean.Database;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.Duration;
 import java.time.Instant;
@@ -769,6 +770,72 @@ public class EbeanPostgresMetadataQueueStoreIT {
         store.detectOffsetAheadOfLog("group-two", meta.id(), meta.partitionCount()).isEmpty());
   }
 
+  @Test
+  public void repeatedEnqueueDoesNotBurnContentTypeSequence() throws Exception {
+    String topic = "topic_" + UUID.randomUUID();
+    String routingKey = "urn:li:test:mime-dedup";
+    long seqBefore = contentTypeSequenceLastValue();
+    int typesBefore = countContentTypeRows();
+
+    store.ensureTopic(topic, defaults);
+    for (int i = 0; i < 50; i++) {
+      store.enqueue(
+          topic,
+          routingKey,
+          defaults,
+          0,
+          new byte[] {(byte) i},
+          Optional.of("application/avro"),
+          List.of());
+    }
+
+    Assert.assertEquals(countContentTypeRows(), typesBefore);
+    long seqAfter = contentTypeSequenceLastValue();
+    Assert.assertTrue(
+        seqAfter - seqBefore <= 1,
+        "expected at most one new content_type id, seqBefore="
+            + seqBefore
+            + " seqAfter="
+            + seqAfter);
+  }
+
+  @Test
+  public void retentionPreservesTailThenEnqueueConsumes() throws Exception {
+    String topic = "topic_" + UUID.randomUUID();
+    store.ensureTopic(topic, defaults);
+    QueueTopicMetadata meta = store.fetchTopic(topic).orElseThrow();
+    String routingKey = routingKeyForPartition(meta.partitionCount(), 0);
+    int partition = MetadataQueueRouting.stablePartitionId(routingKey, meta.partitionCount());
+    String group = "cg-tail";
+
+    for (int i = 0; i < 3; i++) {
+      store.enqueue(
+          topic, routingKey, defaults, 0, new byte[] {(byte) i}, Optional.empty(), List.of());
+    }
+
+    List<QueueReceivedMessage> batch =
+        store.receiveBatchForGroup(
+            group, meta.id(), List.of(partition), "owner", Duration.ofSeconds(60), 10);
+    Assert.assertEquals(batch.size(), 3);
+    store.commitForGroup(group, batch.stream().map(QueueReceivedMessage::handle).toList(), true);
+    long committed = store.getCommittedOffset(group, meta.id(), partition);
+    Assert.assertEquals(committed, 3L);
+
+    deleteNonTailMessageRows(meta.id(), partition);
+    Assert.assertEquals(countMessageRows(meta.id(), partition), 1L);
+    Assert.assertEquals(maxEnqueueSeq(meta.id(), partition), 3L);
+
+    byte[] nextPayload = new byte[] {9};
+    store.enqueue(topic, routingKey, defaults, 0, nextPayload, Optional.empty(), List.of());
+
+    List<QueueReceivedMessage> afterPurge =
+        store.receiveBatchForGroup(
+            group, meta.id(), List.of(partition), "owner", Duration.ofSeconds(60), 10);
+    Assert.assertEquals(afterPurge.size(), 1);
+    Assert.assertEquals(afterPurge.get(0).payload(), nextPayload);
+    Assert.assertEquals(afterPurge.get(0).handle().enqueueSeq(), 4L);
+  }
+
   private void setCommittedOffset(String group, long topicId, int partitionId, long offset)
       throws Exception {
     try (Connection c = database.dataSource().getConnection()) {
@@ -785,6 +852,79 @@ public class EbeanPostgresMetadataQueueStoreIT {
         ps.setInt(3, partitionId);
         ps.setLong(4, offset);
         ps.executeUpdate();
+      }
+    }
+  }
+
+  /** Simulates retention that keeps the per-partition MAX(enqueue_seq) anchor row. */
+  private void deleteNonTailMessageRows(long topicId, int partitionId) throws Exception {
+    try (Connection c = database.dataSource().getConnection()) {
+      try (PreparedStatement ps =
+          c.prepareStatement(
+              "DELETE FROM "
+                  + names.qualifiedMessage()
+                  + " m WHERE m.topic_id = ? AND m.partition_id = ?"
+                  + " AND m.enqueue_seq < ("
+                  + "SELECT MAX(m2.enqueue_seq) FROM "
+                  + names.qualifiedMessage()
+                  + " m2 WHERE m2.topic_id = ? AND m2.partition_id = ?)")) {
+        ps.setLong(1, topicId);
+        ps.setInt(2, partitionId);
+        ps.setLong(3, topicId);
+        ps.setInt(4, partitionId);
+        ps.executeUpdate();
+      }
+    }
+  }
+
+  private long countMessageRows(long topicId, int partitionId) throws Exception {
+    try (Connection c = database.dataSource().getConnection();
+        PreparedStatement ps =
+            c.prepareStatement(
+                "SELECT COUNT(*) FROM "
+                    + names.qualifiedMessage()
+                    + " WHERE topic_id = ? AND partition_id = ?")) {
+      ps.setLong(1, topicId);
+      ps.setInt(2, partitionId);
+      try (var rs = ps.executeQuery()) {
+        rs.next();
+        return rs.getLong(1);
+      }
+    }
+  }
+
+  private long contentTypeSequenceLastValue() throws Exception {
+    String seqName = names.schema() + "." + names.tablePrefix() + "_content_type_id_seq";
+    try (Connection c = database.dataSource().getConnection();
+        PreparedStatement ps = c.prepareStatement("SELECT last_value FROM " + seqName);
+        ResultSet rs = ps.executeQuery()) {
+      rs.next();
+      return rs.getLong(1);
+    }
+  }
+
+  private int countContentTypeRows() throws Exception {
+    try (Connection c = database.dataSource().getConnection();
+        PreparedStatement ps =
+            c.prepareStatement("SELECT COUNT(*) FROM " + names.qualifiedContentType());
+        ResultSet rs = ps.executeQuery()) {
+      rs.next();
+      return rs.getInt(1);
+    }
+  }
+
+  private long maxEnqueueSeq(long topicId, int partitionId) throws Exception {
+    try (Connection c = database.dataSource().getConnection();
+        PreparedStatement ps =
+            c.prepareStatement(
+                "SELECT COALESCE(MAX(enqueue_seq), 0) FROM "
+                    + names.qualifiedMessage()
+                    + " WHERE topic_id = ? AND partition_id = ?")) {
+      ps.setLong(1, topicId);
+      ps.setInt(2, partitionId);
+      try (var rs = ps.executeQuery()) {
+        rs.next();
+        return rs.getLong(1);
       }
     }
   }

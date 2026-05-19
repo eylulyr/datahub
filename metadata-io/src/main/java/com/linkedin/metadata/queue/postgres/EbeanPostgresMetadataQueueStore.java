@@ -499,26 +499,55 @@ public class EbeanPostgresMetadataQueueStore implements MetadataQueueStore {
     }
   }
 
+  /**
+   * Resolves {@code mime} to a catalog id without burning the {@code smallint} identity when the
+   * MIME already exists. {@code INSERT … ON CONFLICT DO NOTHING} still advances identity on
+   * conflict; lookup first and insert only when missing.
+   */
   private short ensureContentTypeRegistered(Connection conn, String mime) throws SQLException {
+    Short existing = lookupContentTypeId(conn, mime);
+    if (existing != null) {
+      return existing;
+    }
     try (PreparedStatement ins =
         conn.prepareStatement(
-            "INSERT INTO "
-                + tableNames.qualifiedContentType()
-                + " (mime) VALUES (?) ON CONFLICT (mime) DO NOTHING")) {
+            "INSERT INTO " + tableNames.qualifiedContentType() + " (mime) VALUES (?)")) {
       ins.setString(1, mime);
       ins.executeUpdate();
+    } catch (SQLException e) {
+      if (!isUniqueViolation(e)) {
+        throw e;
+      }
     }
+    Short inserted = lookupContentTypeId(conn, mime);
+    if (inserted == null) {
+      throw new IllegalStateException("content_type missing after insert: " + mime);
+    }
+    return inserted;
+  }
+
+  @Nullable
+  private Short lookupContentTypeId(Connection conn, String mime) throws SQLException {
     try (PreparedStatement ps =
         conn.prepareStatement(
             "SELECT id FROM " + tableNames.qualifiedContentType() + " WHERE mime = ?")) {
       ps.setString(1, mime);
       try (ResultSet rs = ps.executeQuery()) {
         if (!rs.next()) {
-          throw new IllegalStateException("content_type missing after upsert: " + mime);
+          return null;
         }
         return rs.getShort(1);
       }
     }
+  }
+
+  private static boolean isUniqueViolation(SQLException e) {
+    for (SQLException cur = e; cur != null; cur = cur.getNextException()) {
+      if ("23505".equals(cur.getSQLState())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -1187,6 +1216,23 @@ public class EbeanPostgresMetadataQueueStore implements MetadataQueueStore {
       } catch (SQLException e) {
         tx.rollback();
         throw new IllegalStateException("resetConsumerOffsets failed", e);
+      }
+    }
+  }
+
+  @Override
+  public void applyRetention() {
+    try (Transaction tx = database.beginTransaction(TxScope.requiresNew())) {
+      Connection conn = tx.connection();
+      try {
+        try (PreparedStatement ps =
+            conn.prepareStatement("SELECT " + tableNames.qualifiedApplyRetention() + "()")) {
+          ps.execute();
+        }
+        tx.commit();
+      } catch (SQLException e) {
+        tx.rollback();
+        throw new IllegalStateException("applyRetention failed", e);
       }
     }
   }
