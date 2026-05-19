@@ -7,7 +7,7 @@
 services:
   datahub-frontend-react:
     hostname: datahub-frontend-react
-    image: ${DATAHUB_FRONTEND_IMAGE:-acryldata/datahub-frontend-react}:${DATAHUB_VERSION:-head}
+    image: ${DATAHUB_FRONTEND_IMAGE:-acryldata/datahub-frontend-react}:${DATAHUB_VERSION:-quickstart}
     ports:
       - 9002:9002
     build:
@@ -21,7 +21,7 @@ services:
       - ${HOME}/.datahub/plugins:/etc/datahub/plugins
   datahub-actions:
     hostname: actions
-    image: ${DATAHUB_ACTIONS_IMAGE:-acryldata/datahub-actions}:${DATAHUB_VERSION:-head}-slim
+    image: ${DATAHUB_ACTIONS_IMAGE:-acryldata/datahub-actions}:${DATAHUB_VERSION:-quickstart}-slim
     build:
       context: ../
       dockerfile: docker/datahub-actions/Dockerfile
@@ -34,7 +34,7 @@ services:
         condition: service_healthy
   datahub-gms:
     hostname: datahub-gms
-    image: ${DATAHUB_GMS_IMAGE:-acryldata/datahub-gms}:${DATAHUB_VERSION:-head}
+    image: ${DATAHUB_GMS_IMAGE:-acryldata/datahub-gms}:${DATAHUB_VERSION:-quickstart}
     ports:
       - 8080:8080
     build:
@@ -56,7 +56,7 @@ services:
     - ${HOME}/.datahub/plugins:/etc/datahub/plugins
   datahub-upgrade:
     hostname: datahub-upgrade
-    image: ${DATAHUB_UPGRADE_IMAGE:-acryldata/datahub-upgrade}:${DATAHUB_VERSION:-head}
+    image: ${DATAHUB_UPGRADE_IMAGE:-acryldata/datahub-upgrade}:${DATAHUB_VERSION:-quickstart}
     command:
     - -u
     - SystemUpdate

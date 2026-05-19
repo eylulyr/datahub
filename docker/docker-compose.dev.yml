@@ -10,7 +10,7 @@
 ---
 services:
   datahub-frontend-react:
-    image: acryldata/datahub-frontend-react:head
+    image: acryldata/datahub-frontend-react:quickstart
     ports:
     - ${DATAHUB_MAPPED_FRONTEND_DEBUG_PORT:-5002}:5002
     - ${DATAHUB_MAPPED_FRONTEND_PORT:-9002}:9002
