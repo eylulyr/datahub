@@ -1,0 +1,471 @@
+[
+{
+    "entityType": "container",
+    "entityUrn": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd",
+    "changeType": "UPSERT",
+    "aspectName": "containerProperties",
+    "aspect": {
+        "json": {
+            "customProperties": {
+                "platform": "kinesis",
+                "instance": "acct1-us-east-1",
+                "env": "PROD",
+                "region": "us-east-1"
+            },
+            "name": "us-east-1",
+            "description": "AWS Kinesis streams in region us-east-1",
+            "env": "PROD"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "container",
+    "entityUrn": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd",
+    "changeType": "UPSERT",
+    "aspectName": "dataPlatformInstance",
+    "aspect": {
+        "json": {
+            "platform": "urn:li:dataPlatform:kinesis",
+            "instance": "urn:li:dataPlatformInstance:(urn:li:dataPlatform:kinesis,acct1-us-east-1)"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "container",
+    "entityUrn": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd",
+    "changeType": "UPSERT",
+    "aspectName": "subTypes",
+    "aspect": {
+        "json": {
+            "typeNames": [
+                "Region"
+            ]
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "container",
+    "entityUrn": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd",
+    "changeType": "UPSERT",
+    "aspectName": "browsePathsV2",
+    "aspect": {
+        "json": {
+            "path": [
+                {
+                    "id": "urn:li:dataPlatformInstance:(urn:li:dataPlatform:kinesis,acct1-us-east-1)",
+                    "urn": "urn:li:dataPlatformInstance:(urn:li:dataPlatform:kinesis,acct1-us-east-1)"
+                }
+            ]
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.events-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "dataPlatformInstance",
+    "aspect": {
+        "json": {
+            "platform": "urn:li:dataPlatform:kinesis",
+            "instance": "urn:li:dataPlatformInstance:(urn:li:dataPlatform:kinesis,acct1-us-east-1)"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.events-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "editableDatasetProperties",
+    "aspect": {
+        "json": {
+            "created": {
+                "time": 0,
+                "actor": "urn:li:corpuser:unknown"
+            },
+            "lastModified": {
+                "time": 0,
+                "actor": "urn:li:corpuser:unknown"
+            },
+            "description": "AWS Kinesis stream events-prod in us-east-1"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.events-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "datasetProperties",
+    "aspect": {
+        "json": {
+            "customProperties": {
+                "StreamARN": "arn:aws:kinesis:us-east-1:123456789012:stream/events-prod",
+                "StreamStatus": "ACTIVE",
+                "RetentionPeriodHours": "72",
+                "EncryptionType": "KMS",
+                "OpenShardCount": "8",
+                "KeyId": "alias/events-key"
+            },
+            "tags": []
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.events-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "container",
+    "aspect": {
+        "json": {
+            "container": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.events-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "subTypes",
+    "aspect": {
+        "json": {
+            "typeNames": [
+                "Topic"
+            ]
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.events-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "globalTags",
+    "aspect": {
+        "json": {
+            "tags": [
+                {
+                    "tag": "urn:li:tag:env:prod"
+                },
+                {
+                    "tag": "urn:li:tag:team:events"
+                }
+            ]
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.events-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "browsePathsV2",
+    "aspect": {
+        "json": {
+            "path": [
+                {
+                    "id": "urn:li:dataPlatformInstance:(urn:li:dataPlatform:kinesis,acct1-us-east-1)",
+                    "urn": "urn:li:dataPlatformInstance:(urn:li:dataPlatform:kinesis,acct1-us-east-1)"
+                },
+                {
+                    "id": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd",
+                    "urn": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd"
+                }
+            ]
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.orders-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "dataPlatformInstance",
+    "aspect": {
+        "json": {
+            "platform": "urn:li:dataPlatform:kinesis",
+            "instance": "urn:li:dataPlatformInstance:(urn:li:dataPlatform:kinesis,acct1-us-east-1)"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.orders-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "editableDatasetProperties",
+    "aspect": {
+        "json": {
+            "created": {
+                "time": 0,
+                "actor": "urn:li:corpuser:unknown"
+            },
+            "lastModified": {
+                "time": 0,
+                "actor": "urn:li:corpuser:unknown"
+            },
+            "description": "AWS Kinesis stream orders-prod in us-east-1"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.orders-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "datasetProperties",
+    "aspect": {
+        "json": {
+            "customProperties": {
+                "StreamARN": "arn:aws:kinesis:us-east-1:123456789012:stream/orders-prod",
+                "StreamStatus": "ACTIVE",
+                "RetentionPeriodHours": "24",
+                "EncryptionType": "NONE",
+                "OpenShardCount": "4"
+            },
+            "tags": []
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.orders-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "container",
+    "aspect": {
+        "json": {
+            "container": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.orders-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "subTypes",
+    "aspect": {
+        "json": {
+            "typeNames": [
+                "Topic"
+            ]
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.orders-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "globalTags",
+    "aspect": {
+        "json": {
+            "tags": [
+                {
+                    "tag": "urn:li:tag:env:prod"
+                },
+                {
+                    "tag": "urn:li:tag:team:orders"
+                }
+            ]
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.orders-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "browsePathsV2",
+    "aspect": {
+        "json": {
+            "path": [
+                {
+                    "id": "urn:li:dataPlatformInstance:(urn:li:dataPlatform:kinesis,acct1-us-east-1)",
+                    "urn": "urn:li:dataPlatformInstance:(urn:li:dataPlatform:kinesis,acct1-us-east-1)"
+                },
+                {
+                    "id": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd",
+                    "urn": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd"
+                }
+            ]
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "container",
+    "entityUrn": "urn:li:container:b0192f60fc6d414ee59648562cbf47fd",
+    "changeType": "UPSERT",
+    "aspectName": "status",
+    "aspect": {
+        "json": {
+            "removed": false
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.events-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "status",
+    "aspect": {
+        "json": {
+            "removed": false
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "dataset",
+    "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:kinesis,acct1-us-east-1.orders-prod,PROD)",
+    "changeType": "UPSERT",
+    "aspectName": "status",
+    "aspect": {
+        "json": {
+            "removed": false
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "tag",
+    "entityUrn": "urn:li:tag:env:prod",
+    "changeType": "UPSERT",
+    "aspectName": "tagKey",
+    "aspect": {
+        "json": {
+            "name": "env:prod"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "tag",
+    "entityUrn": "urn:li:tag:team:events",
+    "changeType": "UPSERT",
+    "aspectName": "tagKey",
+    "aspect": {
+        "json": {
+            "name": "team:events"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+},
+{
+    "entityType": "tag",
+    "entityUrn": "urn:li:tag:team:orders",
+    "changeType": "UPSERT",
+    "aspectName": "tagKey",
+    "aspect": {
+        "json": {
+            "name": "team:orders"
+        }
+    },
+    "systemMetadata": {
+        "lastObserved": 1779361200000,
+        "runId": "kinesis-test",
+        "lastRunId": "no-run-id-provided"
+    }
+}
+]
