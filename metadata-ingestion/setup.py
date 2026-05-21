@@ -707,6 +707,7 @@ plugins: Dict[str, Set[str]] = {
     },
     "json-schema": {"requests<3.0.0"},
     "kafka": kafka_common | kafka_protobuf,
+    "kinesis": aws_common,
     "kafka-connect": sql_common
     | {"requests<3.0.0", "JPype1<2.0.0", "jdk4py>=21.0,<22.0"},
     "ldap": {"python-ldap>=2.4,<4.0.0"},
@@ -896,7 +897,7 @@ mypy_stubs = {
     "types-click==0.1.12",
     # The boto3-stubs package seems to have regularly breaking minor releases,
     # we pin to a specific version to avoid this.
-    "boto3-stubs[s3,glue,sagemaker,sts,dynamodb, lakeformation]==1.40.0",
+    "boto3-stubs[s3,glue,sagemaker,sts,dynamodb,kinesis, lakeformation]==1.40.0",
     "types-tabulate<0.10.0",
     # avrogen package requires this
     "types-pytz<2026.0.0",
@@ -1128,6 +1129,7 @@ entry_points = {
         "hive-metastore = datahub.ingestion.source.sql.hive.hive_metastore_source:HiveMetastoreSource",
         "json-schema = datahub.ingestion.source.schema.json_schema:JsonSchemaSource",
         "kafka = datahub.ingestion.source.kafka.kafka:KafkaSource",
+        "kinesis = datahub.ingestion.source.kinesis.kinesis:KinesisSource",
         "kafka-connect = datahub.ingestion.source.kafka_connect.kafka_connect:KafkaConnectSource",
         "ldap = datahub.ingestion.source.ldap:LDAPSource",
         "looker = datahub.ingestion.source.looker.looker_source:LookerDashboardSource",
