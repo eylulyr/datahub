@@ -1,6 +1,9 @@
 import logging
 from typing import Iterable, List, Optional, Union
 
+from botocore.exceptions import BotoCoreError, ClientError
+
+from datahub.configuration.common import ConfigurationError
 from datahub.emitter.mce_builder import make_tag_urn
 from datahub.emitter.mcp_builder import ContainerKey
 from datahub.ingestion.api.common import PipelineContext
@@ -114,6 +117,36 @@ class KinesisSource(StatefulIngestionSourceBase, TestableSource):
             region_name=config.get_region(),
         )
 
+        # Fail fast on unresolvable region — otherwise the first boto3 call
+        # raises NoRegionError deep in get_workunits_internal with no clear
+        # signal about which knob is missing.
+        self.region: str = (
+            config.get_region() or self.kinesis_client.raw.meta.region_name or ""
+        )
+        if not self.region:
+            raise ConfigurationError(
+                "Unable to determine AWS region. Set `region_name` in the recipe, "
+                "`connection.aws_region`, or AWS_DEFAULT_REGION (or ~/.aws/config) "
+                "in the environment running the ingestion."
+            )
+
+        # Without platform_instance, Dataset URNs are scoped only by
+        # (platform, name, env). Stream names commonly repeat across regions,
+        # so two regional recipes that omit platform_instance will silently
+        # collide on the dataset side (the regional container does stay
+        # unique because KinesisRegionContainerKey hashes in `region`).
+        # The config validator already errors when stateful + remove_stale
+        # are also on; this warning catches the no-stateful case.
+        if not config.platform_instance:
+            warning_msg = (
+                "platform_instance is not set. For multi-region or multi-account "
+                f"ingestion this risks Dataset URN collisions (this run targets "
+                f"region '{self.region}'). Set a distinct platform_instance per "
+                f"(account, region), e.g. 'acct1-{self.region}'."
+            )
+            logger.warning(warning_msg)
+            self.report.report_warning("kinesis-config", warning_msg)
+
     @classmethod
     def create(cls, config_dict: dict, ctx: PipelineContext) -> "KinesisSource":
         config = KinesisSourceConfig.model_validate(config_dict)
@@ -128,6 +161,44 @@ class KinesisSource(StatefulIngestionSourceBase, TestableSource):
                 region_name=config.get_region(),
             )
             client.raw.list_streams(Limit=1)
+        except ClientError as e:
+            error = e.response.get("Error", {}) if hasattr(e, "response") else {}
+            code = error.get("Code", "Unknown")
+            message = error.get("Message", str(e))
+            reasons = {
+                "AccessDenied": (
+                    "AWS credentials are valid but lack kinesis:ListStreams permission."
+                ),
+                "AccessDeniedException": (
+                    "AWS credentials are valid but lack kinesis:ListStreams permission."
+                ),
+                "UnrecognizedClientException": (
+                    "AWS access key is not recognized by the target account."
+                ),
+                "InvalidSignatureException": (
+                    "AWS request signature is invalid; check the secret key "
+                    "and that the client clock is in sync."
+                ),
+                "ExpiredTokenException": (
+                    "AWS session token has expired; refresh credentials."
+                ),
+                "ThrottlingException": (
+                    "Kinesis API throttled the test request; retry."
+                ),
+            }
+            return TestConnectionReport(
+                basic_connectivity=CapabilityReport(
+                    capable=False,
+                    failure_reason=reasons.get(code, f"AWS {code}: {message}"),
+                ),
+            )
+        except BotoCoreError as e:
+            # Covers NoRegionError, EndpointConnectionError, NoCredentialsError, etc.
+            return TestConnectionReport(
+                basic_connectivity=CapabilityReport(
+                    capable=False, failure_reason=f"AWS SDK error: {e}"
+                ),
+            )
         except Exception as e:
             return TestConnectionReport(
                 basic_connectivity=CapabilityReport(
@@ -150,27 +221,18 @@ class KinesisSource(StatefulIngestionSourceBase, TestableSource):
         ]
 
     def get_workunits_internal(self) -> Iterable[Union[MetadataWorkUnit, Entity]]:
-        region = self.config.get_region() or self.kinesis_client.raw.meta.region_name
-        if not region:
-            self.report.report_warning(
-                "kinesis",
-                "Unable to determine AWS region. Set `region_name` in the recipe "
-                "or `connection.aws_region`.",
-            )
-            return
-
         container_key = KinesisRegionContainerKey(
             platform=self.platform,
             instance=self.config.platform_instance,
             env=self.config.env,
-            region=region,
+            region=self.region,
         )
 
         yield Container(
             container_key=container_key,
-            display_name=region,
+            display_name=self.region,
             subtype=REGION_SUBTYPE,
-            description=f"AWS Kinesis streams in region {region}",
+            description=f"AWS Kinesis streams in region {self.region}",
         )
 
         # Sort stream names for deterministic ordering — keeps golden files stable.
@@ -179,7 +241,7 @@ class KinesisSource(StatefulIngestionSourceBase, TestableSource):
                 self.report.report_stream_filtered(stream_name)
                 continue
             try:
-                yield from self._extract_stream(stream_name, container_key, region)
+                yield from self._extract_stream(stream_name, container_key)
             except Exception as exc:
                 logger.exception("Failed to extract Kinesis stream %s", stream_name)
                 self.report.report_warning(
@@ -191,7 +253,6 @@ class KinesisSource(StatefulIngestionSourceBase, TestableSource):
         self,
         stream_name: str,
         container_key: KinesisRegionContainerKey,
-        region: str,
     ) -> Iterable[Entity]:
         summary = self.kinesis_client.describe_stream_summary(stream_name)
 
@@ -218,7 +279,7 @@ class KinesisSource(StatefulIngestionSourceBase, TestableSource):
             platform_instance=self.config.platform_instance,
             env=self.config.env,
             subtype=DatasetSubTypes.TOPIC,
-            description=f"AWS Kinesis stream {stream_name} in {region}",
+            description=f"AWS Kinesis stream {stream_name} in {self.region}",
             custom_properties=custom_properties,
             tags=tag_urns or None,
             parent_container=container_key,
