@@ -2,6 +2,7 @@ import { DotsThreeVertical } from '@phosphor-icons/react/dist/csr/DotsThreeVerti
 import { Key } from '@phosphor-icons/react/dist/csr/Key';
 import { Trash } from '@phosphor-icons/react/dist/csr/Trash';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components/macro';
 
 import useDeleteEntity from '@app/entity/shared/EntityDropdown/useDeleteEntity';
@@ -47,6 +48,8 @@ const ActionsButtonStyle = {
     border: 'none',
     boxShadow: 'none',
 };
+
+const GroupPillStyle = { margin: '0 2px 2px 0' };
 
 export const UserContainer = styled.div`
     display: flex;
@@ -177,13 +180,15 @@ export const UserStatusCell = ({ user }: StatusCellProps) => {
 
 // User groups cell component
 export const UserGroupsCell = ({ user }: GroupsCellProps) => {
+    const { t } = useTranslation('entity.identity');
     const groupRelationships = user?.groups?.relationships || [];
+    const unknownGroup = t('users.groups.unknown');
     const groups = groupRelationships.map((relationship) => {
         const group = relationship.entity;
         if (group?.__typename === 'CorpGroup') {
-            return group?.info?.displayName || group?.properties?.displayName || group?.name || 'Unknown Group';
+            return group?.info?.displayName || group?.properties?.displayName || group?.name || unknownGroup;
         }
-        return 'Unknown Group';
+        return unknownGroup;
     });
 
     return (
@@ -196,11 +201,11 @@ export const UserGroupsCell = ({ user }: GroupsCellProps) => {
                 minContainerWidthForOne={100}
                 keyExtractor={(groupName) => groupName}
                 renderPill={(groupName) => (
-                    <Pill variant="outline" color="gray" label={groupName} customStyle={{ margin: '0 2px 2px 0' }} />
+                    <Pill variant="outline" color="gray" label={groupName} customStyle={GroupPillStyle} />
                 )}
                 overflowTooltipContent={() => (
                     <div>
-                        <div style={{ fontWeight: 'bold' }}>Groups</div>
+                        <div style={{ fontWeight: 'bold' }}>{t('users.groups.overflowTitle')}</div>
                         <div
                             style={{
                                 display: 'flex',
@@ -223,6 +228,7 @@ export const UserGroupsCell = ({ user }: GroupsCellProps) => {
 
 // User actions menu component
 export const UserActionsMenu = ({ user, canManagePolicies, onResetPassword, onDelete }: UserActionsMenuProps) => {
+    const { t } = useTranslation('entity.identity');
     const { onDeleteEntity } = useDeleteEntity(
         user.urn,
         EntityType.CorpUser,
@@ -237,7 +243,7 @@ export const UserActionsMenu = ({ user, canManagePolicies, onResetPassword, onDe
             ? {
                   type: 'item' as const,
                   key: 'reset',
-                  title: 'Reset Password',
+                  title: t('users.resetPassword'),
                   icon: Key,
                   onClick: () => onResetPassword(user),
               }
@@ -245,7 +251,7 @@ export const UserActionsMenu = ({ user, canManagePolicies, onResetPassword, onDe
         {
             type: 'item' as const,
             key: 'delete',
-            title: 'Delete User',
+            title: t('users.deleteUser'),
             icon: Trash,
             onClick: onDeleteEntity,
             danger: true,
